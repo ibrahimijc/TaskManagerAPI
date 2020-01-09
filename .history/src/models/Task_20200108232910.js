@@ -13,7 +13,13 @@ const taskSchema = new mongoose.Schema({
 
 });
 
-
+taskSchema.pre('save', function(next){
+    const task = this
+    if (task.isModified('description')){
+        
+    }
+    next();
+})
 
 const Task = mongoose.model('Task',taskSchema);
 
