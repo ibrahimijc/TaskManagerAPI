@@ -37,52 +37,51 @@ const userSchema = new mongoose.Schema({
       if (value < 18)
         throw new Error('Under aged people arent allowed');
     }
-},
-tokens : [{
-  token:{
-    type: String,
-    required: true
-  }
-}]
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 })
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token =  jwt.sign({_id:user._id.toString()},process.env['secret']);
-  user.tokens = user.tokens.concat({token});
-  await user.save();
- 
-  return token;
-}
+  console.log('secret', process.env['secret']);
+  const token = jwt.sign({ _id: user._id.toString() }, process.env['secret']);
+  user.tokens = user.tokens.concat({ token });
 
-userSchema.statics.findByCredentials = async function (email, password) {
-  const user = await User.findOne({ Email: email });
 
-  if (!user) {
-    throw Error('unable to login');
+
+  userSchema.statics.findByCredentials = async function (email, password) {
+    const user = await User.findOne({ Email: email });
+
+    if (!user) {
+      throw Error('unable to login');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.Password);
+
+    if (!isMatch) {
+      throw Error('unable to login');
+    }
+
+    return user;
   }
 
-  const isMatch = await bcrypt.compare(password, user.Password);
-
-  if (!isMatch) {
-    throw Error('unable to login');
-  }
-
-  return user;
-}
-
-//  runs before saving the user to store password as a hash in db
-userSchema.pre('save', async function (next) {
-  const user = this
-  if (user.isModified('Password')) {
-    user.Password = await bcrypt.hash(user.Password, 8);
-  }
-  next();
-})
+  //  runs before saving the user to store password as a hash in db
+  userSchema.pre('save', async function (next) {
+    const user = this
+    if (user.isModified('Password')) {
+      user.Password = await bcrypt.hash(user.Password, 8);
+    }
+    next();
+  })
 
 
 
-const User = mongoose.model('User', userSchema);
+  const User = mongoose.model('User', userSchema);
 
 
-module.exports = User;
+  module.exports = User;

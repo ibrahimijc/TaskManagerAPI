@@ -52,7 +52,6 @@ userSchema.methods.generateAuthToken = async function () {
   user.tokens = user.tokens.concat({token});
   await user.save();
  
-  return token;
 }
 
 userSchema.statics.findByCredentials = async function (email, password) {

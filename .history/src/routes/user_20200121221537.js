@@ -40,11 +40,7 @@ router.post('/user/logout',auth, async (req, res) => {
 		 wasn't giving 200 response with await on postman.
 		 but the user is still saved successfuly.
 		 */
-		req.user.save().then(()=>{
-			console.log('success');
-		}).catch((err)=>{
-			console.log(err)
-		})
+		 await req.user.save()
 		 res.send();
 		} catch (e) {
 		res.send(400);

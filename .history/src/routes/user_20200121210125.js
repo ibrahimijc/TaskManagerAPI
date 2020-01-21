@@ -28,27 +28,16 @@ router.post('/user/login', async (req, res) => {
 
 
 router.post('/user/logout',auth, async (req, res) => {
+	console.log('logout')
 	try {
-		//console.log(req.user);
-		req.user.tokens = req.user.tokens.filter( (token)=>{
+		req.user.tokens = req.user.tokens.filter((token)=>{
 			return token.token !== req.token;
 		})
-		
-		 /*
-		 await req.user.save();
-		 for some reasons the function isn't working with await.
-		 wasn't giving 200 response with await on postman.
-		 but the user is still saved successfuly.
-		 */
-		req.user.save().then(()=>{
-			console.log('success');
-		}).catch((err)=>{
-			console.log(err)
-		})
-		 res.send();
+		await req.user.save();
+		res.send();
 		} catch (e) {
-		res.send(400);
-		}
+		res.status(400).send(e.message);
+	}
 })
 
 /*
@@ -63,6 +52,19 @@ router.get('/user/me', auth, async (req, res) => {
 	const user = req.user;
 	res.send(user)
 })
+
+// router.get('/users',async (req, res) => {
+
+// 	try {
+// 		const users =  await User.find({});
+// 		console.log(users);
+// 		res.send(users)
+// 	}
+// 	catch (e) {
+// 		res.status(500).send();
+// 		console.log(e);
+// 	}
+// })
 
 
 router.get('/user/:id',auth, async (req, res) => {

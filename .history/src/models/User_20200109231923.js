@@ -37,23 +37,18 @@ const userSchema = new mongoose.Schema({
       if (value < 18)
         throw new Error('Under aged people arent allowed');
     }
-},
-tokens : [{
-  token:{
-    type: String,
-    required: true
+
   }
-}]
+
+
 })
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token =  jwt.sign({_id:user._id.toString()},process.env['secret']);
-  user.tokens = user.tokens.concat({token});
-  await user.save();
- 
-  return token;
+  console.log('secret',process.env['secret']);
+  const token = await jwt.sign({_id:user._id.toString()},process.env['secret'])      
 }
+
 
 userSchema.statics.findByCredentials = async function (email, password) {
   const user = await User.findOne({ Email: email });

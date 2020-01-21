@@ -11,20 +11,19 @@ const dotenv = require('dotenv');
 // for using .env variables.
 dotenv.config();
 
-
 /* this middleware function runs before each api call
     Params: req
             res
             next : must to call to tell the function to continue
              to the called route
-
+*/
 app.use((req,res,next)=>{
 
     res.status(500).send()
 
     next();
 })
-*/
+
 app.use(express.json());
 app.use(UserRouter);
 app.use(TaskRouter);

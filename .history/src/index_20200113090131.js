@@ -11,7 +11,6 @@ const dotenv = require('dotenv');
 // for using .env variables.
 dotenv.config();
 
-
 /* this middleware function runs before each api call
     Params: req
             res
