@@ -21,64 +21,33 @@ router.post('/task', auth, async (req, res) => {
     }
 });
 
-// GET/ tasks/?completed=true
+
 router.get('/tasks', auth ,async (req, res) => {
 
-    const sort = {}
-    const match = req.query.completed === 'true'
-    let limit = parseInt (req.query.limit)
-    let skip = parseInt (req.query.skip)
-    let task;
-   
     try {
-        
-        if (req.query.sortBy){
-            let parts = req.query.sortBy.split(':');
-            sort[parts[0]]= parts[1] === 'desc' ? -1 : 1; 
-        }
-        
-        tasks = await Task.find({
-            owner:req.user._id ,  
-            completed : req.query.completed ? match : { $in: [true,false]}  
-        }
-        ).limit(limit).skip(skip).sort(sort);
-        // 1 for ascending, -1 for descending
-        /*
-        if (req.query.completed)
-         tasks = await Task.find({owner:req.user._id , completed : match}).limit(limit).skip(skip);
-        else 
-        tasks = await Task.find( {owner:req.user._id} ).limit(limit).skip(skip).sort({createdAt:-1});
-        */
-        res.send(tasks)
+        const task = await Task.find({owner:req.user._id});
+        res.send(task)
     } catch (e) {
         res.status(500).send(e.message);
     }
 })
 
 
-router.get('/task/:id',auth, async (req, res) => {
-    
+router.get('/task/:id', async (req, res) => {
+
     try {
-        const task = await Task.findOne({
-           _id: req.params.id,
-           owner : req.user._id
-        });
-
-        if (!task){
-            return res.status(404).send();
-        }
-
-
+        const task = await Task.findById(req.params.id);
         res.send(task);
     } catch (e) {
         res.status(404).send();
     }
 })
 
-router.patch('/task/:id', auth, async (req, res) => {
+router.patch('/task/:id', async (req, res) => {
 
     const allowedUpdates = ["description", "completed"];
     const updates = Object.keys(req.body);
+
     let isValidOperation = updates.every((update) => {
         return allowedUpdates.includes(update);
     })
@@ -86,13 +55,13 @@ router.patch('/task/:id', auth, async (req, res) => {
         return res.status(400).send({ 'error': 'invalid update' });
     }
     try {
-        const task = await Task.findOne({_id: req.params.id, owner : req.user._id});
+        const task = await Task.findByIdAndUpdate(req.params.id);
 
         updates.forEach((update) => {
             task[update] = req.body[update];
         })
 
-        await task.save();
+        task.save();
 
         //const task = await Task.findByIdAndUpdate(req.params.id,req.body,{new: true, runValidators: true});
         if (!task) {
@@ -105,17 +74,14 @@ router.patch('/task/:id', auth, async (req, res) => {
 });
 
 
-router.delete('/task/:id',auth, async (req, res) => {
+router.delete('/task/:id', async (req, res) => {
     try {
-        const task = await Task.findOneAndDelete({_id: req.params.id, owner:req.user._id});
+        const task = await Task.findByIdAndDelete(req.params.id);
 
         if (!task) {
             return res.status(400).send();
         }
 
-        
-        //await task.save();
-       
         res.send(task);
     } catch (e) {
         res.status(500).send();

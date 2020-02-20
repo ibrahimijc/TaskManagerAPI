@@ -17,7 +17,6 @@ router.post('/users' ,async (req, res) => {
 
 
 router.post('/user/login', async (req, res) => {
-	
 	try {
 		const user = await User.findByCredentials(req.body.email, req.body.password);
 		const token = await user.generateAuthToken();
@@ -30,14 +29,14 @@ router.post('/user/login', async (req, res) => {
 
 router.post('/user/logout',auth, async (req, res) => {
 	try {
+		//console.log(req.user);
 		req.user.tokens = req.user.tokens.filter( (token)=>{
 			return token.token !== req.token;
 		})
 		
 		await req.user.save();
 		res.send();
-		
-	}catch (e) {
+		} catch (e) {
 		res.send(400);
 		}
 })
@@ -80,41 +79,8 @@ router.get('/user/me', auth, async (req, res) => {
 
 
 
-// router.patch('/user/:id',auth, async (req, res) => {
+router.patch('/user/:id',auth, async (req, res) => {
 
-// 	const allowedUpdates = ["UserName", "Email", "Password", "age"];
-// 	const updates = Object.keys(req.body);
-
-// 	let isValidOperation = updates.every((update) => {
-// 		return allowedUpdates.includes(update);
-// 	})
-// 	if (!isValidOperation) {
-// 		res.status(400).send({ 'error': 'invalid update' });
-// 	}
-// 	try {
-
-// 		const user = await User.findById(req.params.id);
-
-// 		updates.forEach((update) => {
-// 			user[update] = req.body[update];
-// 		})
-// 		await user.save();
-// 		//const user = await User.findByIdAndUpdate(req.params.id,req.body,{new: true, runValidators: true});
-// 		if (!user) {
-// 			return res.status(404).send();
-// 		}
-
-
-// 		res.status(200).send(user);
-// 	} catch (e) {
-// 		res.status(404).send();
-// 	}
-// });
-
-
-router.patch('/user/update',auth, async (req, res) => {
- 
-	
 	const allowedUpdates = ["UserName", "Email", "Password", "age"];
 	const updates = Object.keys(req.body);
 
@@ -126,13 +92,18 @@ router.patch('/user/update',auth, async (req, res) => {
 	}
 	try {
 
-		const user = req.user;
+		const user = await User.findById(req.params.id);
 
 		updates.forEach((update) => {
 			user[update] = req.body[update];
 		})
-		
 		await user.save();
+		//const user = await User.findByIdAndUpdate(req.params.id,req.body,{new: true, runValidators: true});
+		if (!user) {
+			return res.status(404).send();
+		}
+
+
 		res.status(200).send(user);
 	} catch (e) {
 		res.status(404).send();
@@ -140,18 +111,13 @@ router.patch('/user/update',auth, async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
 router.delete('/user/me', auth , async function (req, res) {
 	try {
-		 // req.user is coming from middlewear auth
+		
+		
 		 await req.user.remove();
 		 res.send(req.user);
+		
 	} catch (e) {
 		res.status(500).send();
 	}

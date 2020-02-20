@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const Task = require('./Task');
 const userSchema = new mongoose.Schema({
   UserName: {
     type: String,
@@ -29,7 +28,7 @@ const userSchema = new mongoose.Schema({
     validate(value) {
       if (value.toLowerCase() == 'password')
         throw new Error(`bad boys don't keep passsword as password`)
-    } 
+    }
   },
   age: {
     type: String,
@@ -45,20 +44,9 @@ tokens : [{
     required: true
   }
 }]
-},
-{
-  timestamps : true
-}
-)
-
-userSchema.virtual('userTasks',{
-  ref: 'Task',
-  localField: '_id',
-  foreignField: 'owner'
 })
 
-// toJSON method is called before a JSON.strigify.. res.send() calls
-// JSON.stringify()
+
 userSchema.methods.toJSON = function(){
   const user = this;
   const userObject =  user.toObject();
@@ -79,13 +67,13 @@ userSchema.methods.generateAuthToken = async function () {
 
 userSchema.statics.findByCredentials = async function (email, password) {
   const user = await User.findOne({ Email: email });
-  
+
   if (!user) {
     throw Error('unable to login');
   }
 
   const isMatch = await bcrypt.compare(password, user.Password);
-  
+
   if (!isMatch) {
     throw Error('unable to login');
   }
@@ -102,12 +90,6 @@ userSchema.pre('save', async function (next) {
   next();
 })
 
-userSchema.pre('remove',async function(next){
-  const user = this;
-  await Task.deleteMany({owner: user._id});
-
-  next();
-})
 
 
 const User = mongoose.model('User', userSchema);

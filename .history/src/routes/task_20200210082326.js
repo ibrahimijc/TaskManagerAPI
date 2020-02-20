@@ -24,31 +24,14 @@ router.post('/task', auth, async (req, res) => {
 // GET/ tasks/?completed=true
 router.get('/tasks', auth ,async (req, res) => {
 
-    const sort = {}
+
     const match = req.query.completed === 'true'
-    let limit = parseInt (req.query.limit)
-    let skip = parseInt (req.query.skip)
-    let task;
-   
+    let task
     try {
-        
-        if (req.query.sortBy){
-            let parts = req.query.sortBy.split(':');
-            sort[parts[0]]= parts[1] === 'desc' ? -1 : 1; 
-        }
-        
-        tasks = await Task.find({
-            owner:req.user._id ,  
-            completed : req.query.completed ? match : { $in: [true,false]}  
-        }
-        ).limit(limit).skip(skip).sort(sort);
-        // 1 for ascending, -1 for descending
-        /*
         if (req.query.completed)
-         tasks = await Task.find({owner:req.user._id , completed : match}).limit(limit).skip(skip);
+         tasks = await Task.find({owner:req.user._id , completed : match}).limit(parseInt(req.query.limit));
         else 
-        tasks = await Task.find( {owner:req.user._id} ).limit(limit).skip(skip).sort({createdAt:-1});
-        */
+        tasks = await Task.find({owner:req.user._id  }).limit(parseInt(req.query.limit));
         res.send(tasks)
     } catch (e) {
         res.status(500).send(e.message);

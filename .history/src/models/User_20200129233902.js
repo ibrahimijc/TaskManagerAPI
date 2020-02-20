@@ -45,11 +45,7 @@ tokens : [{
     required: true
   }
 }]
-},
-{
-  timestamps : true
-}
-)
+})
 
 userSchema.virtual('userTasks',{
   ref: 'Task',

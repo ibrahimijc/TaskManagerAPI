@@ -17,7 +17,7 @@ router.post('/users' ,async (req, res) => {
 
 
 router.post('/user/login', async (req, res) => {
-	
+	console.log('here');
 	try {
 		const user = await User.findByCredentials(req.body.email, req.body.password);
 		const token = await user.generateAuthToken();
@@ -149,9 +149,11 @@ router.patch('/user/update',auth, async (req, res) => {
 
 router.delete('/user/me', auth , async function (req, res) {
 	try {
-		 // req.user is coming from middlewear auth
+		
+		
 		 await req.user.remove();
 		 res.send(req.user);
+		
 	} catch (e) {
 		res.status(500).send();
 	}
