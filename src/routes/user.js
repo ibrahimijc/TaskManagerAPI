@@ -4,6 +4,9 @@ const router = new express.Router();
 const User = require('../models/User')
 const auth = require('../middlewear/Auth');
 
+var multer  = require('multer')
+var upload = multer({ dest: 'avatars/' })
+
 router.post('/users' ,async (req, res) => {
 	const user = new User(req.body);
 	try {
@@ -42,6 +45,16 @@ router.post('/user/logout',auth, async (req, res) => {
 		}
 })
 
+
+/* 
+upload.single() => middlewear function for saving forms
+
+*/
+router.post('/user/me/avatar', upload.single('avatar') ,async(req,res) => {
+
+})
+
+
 /*
     Params:
     @String: route path,
@@ -56,60 +69,6 @@ router.get('/user/me', auth, async (req, res) => {
 })
 
 
-// router.get('/user/:id',auth, async (req, res) => {
-// 	try {
-// 		const user = await User.findById(req.params.id);
-// 		res.status(200).send(user);
-// 	}
-// 	catch (e) {
-// 		res.status(404).send();
-// 	}
-// })
-
-
-// router.get('/user/:id',auth, async (req, res) => {
-// 	try {
-// 		const user = await User.findById(req.params.id);
-// 		res.status(200).send(user);
-// 	}
-// 	catch (e) {
-// 		res.status(404).send();
-// 	}
-// })
-
-
-
-
-// router.patch('/user/:id',auth, async (req, res) => {
-
-// 	const allowedUpdates = ["UserName", "Email", "Password", "age"];
-// 	const updates = Object.keys(req.body);
-
-// 	let isValidOperation = updates.every((update) => {
-// 		return allowedUpdates.includes(update);
-// 	})
-// 	if (!isValidOperation) {
-// 		res.status(400).send({ 'error': 'invalid update' });
-// 	}
-// 	try {
-
-// 		const user = await User.findById(req.params.id);
-
-// 		updates.forEach((update) => {
-// 			user[update] = req.body[update];
-// 		})
-// 		await user.save();
-// 		//const user = await User.findByIdAndUpdate(req.params.id,req.body,{new: true, runValidators: true});
-// 		if (!user) {
-// 			return res.status(404).send();
-// 		}
-
-
-// 		res.status(200).send(user);
-// 	} catch (e) {
-// 		res.status(404).send();
-// 	}
-// });
 
 
 router.patch('/user/update',auth, async (req, res) => {
@@ -157,25 +116,6 @@ router.delete('/user/me', auth , async function (req, res) {
 	}
 })
 
-
-
-
-
-
-
-// router.delete('/user/:id', auth,async (req, res) => {
-// 	try {
-// 		const user = await User.findByIdAndDelete(req.params.id);
-
-// 		if (!user) {
-// 			return res.status(400).send();
-// 		}
-
-// 		res.send(user);
-// 	} catch (e) {
-// 		res.status(500).send();
-// 	}
-// })
 
 
 module.exports = router;

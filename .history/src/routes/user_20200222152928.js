@@ -4,6 +4,9 @@ const router = new express.Router();
 const User = require('../models/User')
 const auth = require('../middlewear/Auth');
 
+var multer  = require('multer')
+var upload = multer({ dest: 'avatars/' })
+
 router.post('/users' ,async (req, res) => {
 	const user = new User(req.body);
 	try {
@@ -17,6 +20,7 @@ router.post('/users' ,async (req, res) => {
 
 
 router.post('/user/login', async (req, res) => {
+	
 	try {
 		const user = await User.findByCredentials(req.body.email, req.body.password);
 		const token = await user.generateAuthToken();
@@ -29,19 +33,27 @@ router.post('/user/login', async (req, res) => {
 
 router.post('/user/logout',auth, async (req, res) => {
 	try {
-		//console.log(req.user);
 		req.user.tokens = req.user.tokens.filter( (token)=>{
 			return token.token !== req.token;
 		})
-		console.log(req.user);
+		
 		await req.user.save();
-		console.log('idhar');
 		res.send();
-		} catch (e) {
-		console.log(e);
-		res.status(400).send(e.message);
+		
+	}catch (e) {
+		res.send(400);
 		}
 })
+
+
+/* 
+upload.single() => middlewear function for saving forms
+
+*/
+router.post('/user/me/avatar', upload.single('avatar') ,async(req,res) => {
+
+})
+
 
 /*
     Params:
@@ -57,19 +69,11 @@ router.get('/user/me', auth, async (req, res) => {
 })
 
 
-router.get('/user/:id',auth, async (req, res) => {
-	try {
-		const user = await User.findById(req.params.id);
-		res.status(200).send(user);
-	}
-	catch (e) {
-		res.status(404).send();
-	}
-})
 
 
-router.patch('/user/:id',auth, async (req, res) => {
-
+router.patch('/user/update',auth, async (req, res) => {
+ 
+	
 	const allowedUpdates = ["UserName", "Email", "Password", "age"];
 	const updates = Object.keys(req.body);
 
@@ -81,37 +85,37 @@ router.patch('/user/:id',auth, async (req, res) => {
 	}
 	try {
 
-		const user = await User.findById(req.params.id);
+		const user = req.user;
 
 		updates.forEach((update) => {
 			user[update] = req.body[update];
 		})
+		
 		await user.save();
-		//const user = await User.findByIdAndUpdate(req.params.id,req.body,{new: true, runValidators: true});
-		if (!user) {
-			return res.status(404).send();
-		}
-
-
 		res.status(200).send(user);
 	} catch (e) {
 		res.status(404).send();
 	}
 });
 
-router.delete('/user/:id', auth,async (req, res) => {
+
+
+
+
+
+
+
+
+router.delete('/user/me', auth , async function (req, res) {
 	try {
-		const user = await User.findByIdAndDelete(req.params.id);
-
-		if (!user) {
-			return res.status(400).send();
-		}
-
-		res.send(user);
+		 // req.user is coming from middlewear auth
+		 await req.user.remove();
+		 res.send(req.user);
 	} catch (e) {
 		res.status(500).send();
 	}
 })
+
 
 
 module.exports = router;
