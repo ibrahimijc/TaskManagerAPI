@@ -141,7 +141,7 @@ router.delete('/user/me/avatar',auth, async function (req,res){
 	try{
 		req.user.avatar = undefined;
 		await req.user.save();
-		res.status(200).send();
+		res.status(200).send()
 	}catch(e){
 		res.status(500).send();
 	}

@@ -37,6 +37,8 @@ router.post('/user/login', async (req, res) => {
 	
 	try {
 		const user = await User.findByCredentials(req.body.email, req.body.password);
+		console.log(req.body.email);
+		console.log(req.body.password);
 		const token = await user.generateAuthToken();
 		res.send({ user, token });
 	} catch (e) {
@@ -141,7 +143,7 @@ router.delete('/user/me/avatar',auth, async function (req,res){
 	try{
 		req.user.avatar = undefined;
 		await req.user.save();
-		res.status(200).send();
+		res.send(req.user)
 	}catch(e){
 		res.status(500).send();
 	}

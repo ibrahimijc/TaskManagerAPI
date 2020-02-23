@@ -6,19 +6,8 @@ const auth = require('../middlewear/Auth');
 
 var multer  = require('multer')
 var upload = multer({ 
-	limits: {
-		fileSize: 1000000	
-	},
-	fileFilter(req,file,cb){
-		if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
-		{
-			return cb(new Error("Please upload a image file"));
-		}
-
-		cb(undefined,true);
-
-	}
-	
+	dest: 'avatars/',
+	sdsize: 1	
 })
 
 router.post('/users' ,async (req, res) => {
@@ -64,14 +53,10 @@ router.post('/user/logout',auth, async (req, res) => {
 upload.single() => middlewear function for saving forms
 
 */
-router.post('/user/me/avatar', auth , upload.single('avatar') , async (req,res) => {
-	// req.file.buffer is only avaialble if we don't have dest in multer object
-	req.user.avatar = req.file.buffer;
-	await req.user.save();
-	res.sendStatus(200);
+router.post('/user/me/avatar', upload.single('avatar') ,(req,res) => {
 	
-}, (error,req,res,next) => {
-	res.status(400).send({error: error.message});
+		res.sendStatus(200);
+	
 })
 
 
@@ -136,16 +121,6 @@ router.delete('/user/me', auth , async function (req, res) {
 	}
 })
 
-
-router.delete('/user/me/avatar',auth, async function (req,res){
-	try{
-		req.user.avatar = undefined;
-		await req.user.save();
-		res.status(200).send();
-	}catch(e){
-		res.status(500).send();
-	}
-})
 
 
 module.exports = router;

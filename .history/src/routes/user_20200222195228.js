@@ -64,7 +64,7 @@ router.post('/user/logout',auth, async (req, res) => {
 upload.single() => middlewear function for saving forms
 
 */
-router.post('/user/me/avatar', auth , upload.single('avatar') , async (req,res) => {
+router.post('/user/me/avatar', upload.single('avatar') , async (req,res) => {
 	// req.file.buffer is only avaialble if we don't have dest in multer object
 	req.user.avatar = req.file.buffer;
 	await req.user.save();
@@ -136,16 +136,6 @@ router.delete('/user/me', auth , async function (req, res) {
 	}
 })
 
-
-router.delete('/user/me/avatar',auth, async function (req,res){
-	try{
-		req.user.avatar = undefined;
-		await req.user.save();
-		res.status(200).send();
-	}catch(e){
-		res.status(500).send();
-	}
-})
 
 
 module.exports = router;
