@@ -92,7 +92,6 @@ router.get('/user/me', auth, async (req, res) => {
 	res.send(user)
 })
 
-// A route for serving pictures. Just for testing
 router.get('/user/:id/pic', async (req,res) => {
 
 	try{

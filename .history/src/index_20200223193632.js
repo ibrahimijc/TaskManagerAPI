@@ -13,6 +13,7 @@ dotenv.config();
 
 const port = process.env.port;
 
+
 app.use(express.json());
 app.use(UserRouter);
 app.use(TaskRouter);
@@ -21,6 +22,6 @@ app.use(TaskRouter);
 
 
 app.listen(port, () => {
-    console.log('server is running at',port);
+    console.log('server is running');
 });
 

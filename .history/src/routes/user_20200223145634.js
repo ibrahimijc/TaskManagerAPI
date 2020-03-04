@@ -68,13 +68,13 @@ upload.single() => middlewear function for saving forms
 */
 router.post('/user/me/avatar', auth , upload.single('avatar') , async (req,res) => {
 	// req.file.buffer is only avaialble if we don't have dest in multer object
-	const buffer = await sharp(req.file.buffer).png().resize({width:250,height:250}).toBuffer();
 	
-	req.user.avatar = buffer;
+	
+	req.user.avatar = req.file.buffer;
 	await req.user.save();
 	res.sendStatus(200);
 	
-}, (error,req,res,next) => {	
+}, (error,req,res,next) => {
 	res.status(400).send({error: error.message});
 })
 
@@ -92,24 +92,7 @@ router.get('/user/me', auth, async (req, res) => {
 	res.send(user)
 })
 
-// A route for serving pictures. Just for testing
-router.get('/user/:id/pic', async (req,res) => {
 
-	try{
-	const user = await User.findById(req.params.id);
-
-	if (!user || !user.avatar){
-		throw new Error("User not exist")
-	}
-	res.set('Content-Type','image/png');
-	res.send(user.avatar);
-
-	}
-	catch(e){
-		res.status(400).send();
-	}
-
-})
 
 
 router.patch('/user/update',auth, async (req, res) => {
@@ -138,6 +121,12 @@ router.patch('/user/update',auth, async (req, res) => {
 		res.status(404).send();
 	}
 });
+
+
+
+
+
+
 
 
 
