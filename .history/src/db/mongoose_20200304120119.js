@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 mongoose.set('useCreateIndex', true);
 
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
 dotenv.config();
 
 
